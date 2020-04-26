@@ -10,4 +10,4 @@ This must be deployed on your own server as the official Integram bot does not s
 
 Code available on GPLV3 [license](https://github.com/irvinlim/integram-github/blob/master/LICENSE). Some code adapted from [integram-org/gitlab](https://github.com/integram-org/gitlab).
 
-![Analytics](https://ga-beacon.irvinlim.com/UA-61872435-6/github_readme)
+![Analytics](https://gabeacon.irvinlim.com/UA-61872435-6/github_readme)
