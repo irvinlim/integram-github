@@ -134,13 +134,11 @@ func webhookHandler(c *integram.Context, request *integram.WebhookContext) error
 			return fmt.Errorf("could not parse hook URL \"%s\": unexpected URL format", p.GetHook().GetURL())
 		}
 
-		// Get repository name and URL
-		repoName := strings.Join(pathParts[1:3], "/")
-		repoURL := c.ServiceBaseURL
-		repoURL.Path = repoName
+		// Get repository name
+		repoName := strings.Join(pathParts[2:4], "/")
 
 		text := fmt.Sprintf("Successfully integrated with %s!\nZen message: %s",
-			m.URL(repoName, repoURL.String()),
+			m.Bold(repoName),
 			m.Italic(p.GetZen()),
 		)
 
