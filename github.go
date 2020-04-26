@@ -116,6 +116,40 @@ func webhookHandler(c *integram.Context, request *integram.WebhookContext) error
 	// Get event type from request header
 	eventType := request.Header("X-GitHub-Event")
 	switch eventType {
+	case "ping":
+		var p gh.PingEvent
+
+		// Parse payload
+		if err := request.JSON(&p); err != nil {
+			return fmt.Errorf("could not parse payload: %s", err)
+		}
+
+		// Parse hook URL
+		hookURL, err := url.Parse(p.GetHook().GetURL())
+		if err != nil {
+			return fmt.Errorf("could not parse hook URL \"%s\": %s", p.GetHook().GetURL(), err)
+		}
+		pathParts := strings.Split(hookURL.Path, "/")
+		if len(pathParts) < 3 {
+			return fmt.Errorf("could not parse hook URL \"%s\": unexpected URL format", p.GetHook().GetURL())
+		}
+
+		// Get repository name and URL
+		repoName := strings.Join(pathParts[1:3], "/")
+		repoURL := c.ServiceBaseURL
+		repoURL.Path = repoName
+
+		text := fmt.Sprintf("Successfully integrated with %s!\nZen message: %s",
+			m.URL(repoName, repoURL.String()),
+			m.Italic(p.GetZen()),
+		)
+
+		if err := c.Chat.SetCache(fmt.Sprintf("hook_%d", p.GetHookID()), text, time.Hour*24*30); err != nil {
+			c.Log().WithError(err).Error("could not set cache")
+		}
+
+		return msg.AddEventID(fmt.Sprintf("hook_%d", p.GetHookID())).SetText(text).EnableHTML().Send()
+
 	case "push":
 		var p gh.PushEvent
 
